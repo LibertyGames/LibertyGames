@@ -290,6 +290,7 @@ window.runCreator = function(text) {
 // Play the Start passage
 // SugarCube.Engine.play("Start");</script><tw-passagedata pid="1" name="Creator" tags="" position="1250,350" size="100,100">&lt;script src=&quot;https://cdn.jsdelivr.net/npm/marked/marked.min.js&quot;&gt;&lt;/script&gt;
 &lt;div class=&quot;container&quot;&gt;
+    &lt;script&gt;window.onPerchance = false&lt;/script&gt;
     &lt;h2&gt;Course of Temptation Auto Text Converter&lt;/h2&gt;
     &lt;div class=&quot;text-areas&quot;&gt;
         &lt;textarea id=&quot;userInput&quot; placeholder=&quot;Type something...&quot;&gt;&lt;/textarea&gt;
@@ -300,21 +301,21 @@ window.runCreator = function(text) {
         &lt;div id=&quot;preview&quot; class=&quot;preview&quot;&gt;&lt;/div&gt;
     &lt;/div&gt;
     &lt;div class=&quot;buttons&quot;&gt;
-        &lt;button onclick=&quot;convertText()&quot;&gt;Convert&lt;/button&gt;
-        &lt;button onclick=&quot;convertBack()&quot;&gt;Revert&lt;/button&gt;
+        &lt;button onclick=&quot;convertText(); toggleMarkdown(false);&quot;&gt;Convert&lt;/button&gt;
+        &lt;button onclick=&quot;convertBack(); toggleMarkdown(false);&quot;&gt;Revert&lt;/button&gt;
         &lt;button onclick=&quot;copyToClipboard()&quot;&gt;Copy&lt;/button&gt;
         &lt;button onclick=&quot;pasteFromClipboard()&quot;&gt;Paste&lt;/button&gt;
     &lt;/div&gt;
     &lt;div class=&quot;buttons&quot;&gt;
-        &lt;button onclick=&quot;sendEventPrompt(false)&quot;&gt;Generate with AI&lt;/button&gt;
-        &lt;button onclick=&quot;convertFull()&quot;&gt;Convert to Full Mod&lt;/button&gt;
-        &lt;button id=&quot;sendLargePrompt&quot; onclick=&quot;promptAndConvertToFull()&quot;&gt;Generate Full Mod&lt;/button&gt;
-        &lt;button onclick=&quot;runCreator(document.getElementById(&#39;output&#39;).value)&quot;&gt;Run&lt;/button&gt;
+        &lt;button onclick=&quot;sendEventPrompt(false); toggleMarkdown(false);&quot;&gt;Generate with AI&lt;/button&gt;
+        &lt;button onclick=&quot;convertFull(); toggleMarkdown(false);&quot;&gt;Convert to Full Mod&lt;/button&gt;
+        &lt;button id=&quot;sendLargePrompt&quot; onclick=&quot;promptAndConvertToFull(); toggleMarkdown(false);&quot;&gt;Generate Full Mod&lt;/button&gt;
+        &lt;button onclick=&quot;runCreator(document.getElementById(&#39;output&#39;).value)&quot; {{ onPerchance ? &#39;disabled&#39; : &#39;&#39; }}&gt;Run&lt;/button&gt;
     &lt;/div&gt;
     &lt;div class=&quot;buttons&quot;&gt;
         &lt;button onclick=&quot;sendPrompt(false)&quot;&gt;Send Regular Prompt&lt;/button&gt;
-        &lt;button onclick=&quot;sendTriggerPrompt(false, false)&quot;&gt;Generate Event Trigger&lt;/button&gt;
-        &lt;button onclick=&quot;sendTriggerPrompt(false)&quot;&gt;Generate Event Trigger with AI&lt;/button&gt;
+        &lt;button onclick=&quot;sendTriggerPrompt(false, false); toggleMarkdown(false);&quot;&gt;Generate Event Trigger&lt;/button&gt;
+        &lt;button onclick=&quot;sendTriggerPrompt(false); toggleMarkdown(false);&quot;&gt;Generate Event Trigger with AI&lt;/button&gt;
         &lt;button onclick=&quot;toggleMarkdown()&quot;&gt;Toggle Markdown&lt;/button&gt;
     &lt;/div&gt;
     &lt;div class=&quot;instructions&quot;&gt;
@@ -515,7 +516,7 @@ window.runCreator = function(text) {
     }
 /*------------------------- PERCHANCE -------------------------*/
 
-    async function sendPrompt(returnValue = false, onPerchance = false) {
+    async function sendPrompt(returnValue = false) {
       // Get the value from the input field
       var inputValue = document.getElementById(&quot;userInput&quot;).value;
       if (returnValue === false) document.getElementById(&quot;output&quot;).value = &quot;&quot;;
@@ -564,11 +565,12 @@ window.runCreator = function(text) {
         console.log(&quot;Output Text Value:&quot;, outputTextValue.generatedText);
         // Set the value to the &lt;p&gt; element
         if (returnValue === false) document.getElementById(&quot;output&quot;).value = outputTextValue.generatedText;
-        toggleMarkdown();
+        toggleMarkdown(false);
+        toggleMarkdown(true);
         return outputTextValue.generatedText;
     }
 
-    async function sendEventPrompt(returnValue = false, onPerchance = false) {
+    async function sendEventPrompt(returnValue = false) {
       // Get the value from the input field
       var inputValue = document.getElementById(&quot;userInput&quot;).value;
       if (returnValue === false) document.getElementById(&quot;output&quot;).value = &quot;&quot;;
@@ -657,7 +659,7 @@ window.runCreator = function(text) {
         return outputTextValue.generatedText;
     }
 
-    async function sendTriggerPrompt(returnValue = false, aiEnabled = true, onPerchance = false) {
+    async function sendTriggerPrompt(returnValue = false, aiEnabled = true) {
       // Get the value from the input field
       var inputValue = document.getElementById(&quot;userInput&quot;).value;
       let outputTextValue = null;
@@ -685,6 +687,24 @@ The passage property, which indicates the passage to play. Use the name specifie
         passage: &quot;EventDiningHallOgle&quot;,
 
 Tags, besides passage property, is the most important. Again, it determines the list of possible events that can be played. However, tags are EXTREMELY STRICT, so ONLY use them if your event matches, or else, leave the propety like this: tags: []
+    Walking on Campus Events
+        tags: [&quot;campus walk&quot;],
+    Walking in Town Events
+        tags: [&quot;town walk&quot;],
+    Walking in Campus or Town Events
+        tags: [&quot;town walk&quot;, &quot;campus walk&quot;],
+    Walking in Campus or Town or Dorm Hall Events
+        tags: [&quot;campus walk&quot;, &quot;town walk&quot;, &quot;residence hall&quot;, &quot;MainHall&quot;],
+    Classroom During Class Events
+        tags: [&quot;classroom&quot;],
+    Entering Dorm Events
+        tags: [&quot;entering dorm&quot;],
+    Passing Out Drunk Events
+        tags: [&quot;passout drunk&quot;],
+    Library Studying Events
+        tags: [&quot;study&quot;, &quot;SmithLibrary&quot;],
+    Library Reading Events
+        tags: [&quot;reading book&quot;, &quot;LibraryMezzanine&quot;],
 	Summit Market Job Events
 		tags: [&quot;job&quot;, &quot;dining hall&quot;],
 	Eating at QuickieBurger Events
@@ -695,8 +715,53 @@ Tags, besides passage property, is the most important. Again, it determines the 
         tags: [&quot;job&quot;, &quot;QuickieBurger&quot;, &quot;window&quot;],
 	Shower Events
         tags: [&quot;shower&quot;, &quot;normal&quot;],
+	Shower Masturbation Events
+        tags: [&quot;shower&quot;, &quot;normal&quot;, &quot;masturbation&quot;],
 	Restroom Events
         tags: [&quot;restroom&quot;],
+    Retrieving Laundry in Dorm Events
+        tags: [&quot;retrieve laundry&quot;],
+    Running in College Park Events
+        tags: [&quot;park run&quot;],
+    Chatting at Someone Else&#39;s Dorm/House/Apartment Events
+        tags: [&quot;resident&quot;, &quot;chat&quot;],
+    Watching a Movie at Someone Else&#39;s Dorm/House/Apartment Events
+        tags: [&quot;resident&quot;, &quot;movie&quot;],
+    Walking on Campus or Town with Cum Events
+        tags: [&quot;town walk&quot;, &quot;campus walk&quot;, &quot;cum walk&quot;, &quot;visible cum&quot;],
+    Walking on Campus or Town with Cum Events
+        tags: [&quot;town walk&quot;, &quot;campus walk&quot;, &quot;cum walk&quot;, &quot;visible cum&quot;],
+    Campus Party Chatting Events
+        tags: [&quot;quad party&quot;, &quot;chat&quot;],
+    Riverrat Shady Bar Chilling at Table Events
+        tags: [&quot;River Rat&quot;, &quot;table&quot;, &quot;chill&quot;, &quot;drink&quot;],
+    Riverrate Shady Bar Chatting/Flirting at Barstool Events
+        tags: [&quot;River Rat&quot;, &quot;bar&quot;, &quot;chat&quot;],
+        tags: [&quot;River Rat&quot;, &quot;bar&quot;, &quot;flirt&quot;],
+    River Rat Working as Bartender
+        tags: [&quot;river rat server post&quot;, &quot;river rat bartender post&quot;],
+    River Rat Working as Waitress
+        tags: [&quot;river rat server&quot;, &quot;take order&quot;, &quot;friendly&quot;],
+    Quad Party Chat Event
+        tags: [&quot;quad party&quot;, &quot;chat&quot;],
+    Streaming Events
+        tags: [&quot;streaming&quot;, &quot;chatting&quot;, &quot;gaming&quot;, &quot;art&quot;, &quot;dancing&quot;, &quot;chess&quot;, &quot;workout&quot;],
+    Changing Clothes Interruption
+        tags: [&quot;wardrobe interrupt&quot;],
+    Dorm Lounde Watching TV Events
+        tags: [&quot;lounge tv&quot;],
+    College Dining Hall Events
+        tags: [&quot;dining hall&quot;, &quot;eat&quot;, &quot;single&quot;],
+        tags: [&quot;dining hall&quot;, &quot;eat&quot;, &quot;one&quot;],
+        tags: [&quot;dining hall&quot;, &quot;eat&quot;, &quot;many&quot;],
+    College Gym Events
+        tags: [&quot;gym&quot;, &quot;cardio&quot;],
+        tags: [&quot;gym&quot;, &quot;swim&quot;],
+        tags: [&quot;gym&quot;, &quot;yoga&quot;],
+    Bus Events
+        tags: [&quot;bus&quot;, &quot;leaving&quot;, &quot;returning&quot;],
+    Everywhere
+        tags: [&quot;ResidentsLounge&quot;, &quot;ResidenceLaundry&quot;, &quot;residence hall&quot;, &quot;MainHall&quot;, &quot;Blodgett Gym&quot;, &quot;BlodgettGymMensLocker&quot;, &quot;BlodgettGymWomensLocker&quot;, &quot;quad party&quot;, &quot;River Rat&quot;, &quot;RiversideMotel&quot;, &quot;RiversideMotelRoom&quot;, &quot;YourDorm&quot;, &quot;shower&quot;, &quot;restroom&quot;, &quot;normal&quot;, &quot;table&quot;, &quot;bar&quot;, &quot;chill&quot;, &quot;drink&quot;, &quot;chat&quot;, &quot;gym&quot;, &quot;bulking&quot;, &quot;yoga&quot;, &quot;wardrobe interrupt&quot;, &quot;wakeup&quot;],
 
 Checkvar allows you to check run a specific condition to trigger the event. Some Examples of Checkvar Usage are below.
         checkvar: &quot;setup.Needs.get_need(&#39;rest&#39;) lt 500&quot;,
@@ -728,6 +793,28 @@ Find NPC finds an NPC for an event to run with based on the npc&#39;s properties
         findnpc: {attitudes: [&quot;lust&quot;], customer: true, attractiontopc: true, attractionfrompc: true, inclinations: &quot;forward&quot;, strictinclinations: true, 
         findnpc: {attitudes: [&quot;lust&quot;], employee: true, attractiontopc: true, attractionfrompc: true, willingsex: true, inclinations: &quot;not_shy&quot;, strictinclinations: true, nopartner: true},
         findnpc: {attractionfrompc: true, attractiontopc: true, relationship: [&quot;fuckbuddy&quot;], residence: &quot;Chicory Hall&quot;},
+        findnpc: {attitudes: [&quot;friendship&quot;], inverseattitude: true, desiredrelationships: [&quot;hatefuck&quot;, &quot;rival&quot;], type: &quot;student&quot;, exclude: &quot;$quadparty.chatgroup&quot;},
+        findnpc: {relationships: [&quot;friend&quot;, &quot;best friend&quot;]},
+        findnpc2: {attractionfrompc: true, attractiontopc: true, likes: true, unknownonly: true, willingsex: true},
+        findnpc: {attractionfrompc: true, attractiontopc: true, relationship: [&quot;fuckbuddy&quot;], residence: &quot;Chicory Hall&quot;},
+
+Locations specify at which locations the event happens. Nolocations is the opposite. Location blocks specify at which location blocks the event happens. 
+        locations: [&quot;YourDorm&quot;],
+        locations: [&quot;HallowellRd&quot;],
+        locations: [&quot;ThoreauRd&quot;, &quot;EmersonRd&quot;, &quot;HallowellRd&quot;],
+        locations: [&quot;ChamberlainHall&quot;, &quot;EmersonRd&quot;, &quot;HallowellRd&quot;, &quot;Library&quot;, &quot;SummitMarket&quot;, &quot;ThoreauRd&quot;],
+        locations: [&quot;BlodgettGym&quot;, &quot;ChamberlainHall&quot;, &quot;EmersonRd&quot;, &quot;HallowellRd&quot;, &quot;HannaRdN&quot;, &quot;HannaRdS&quot;, &quot;LongfellowRd&quot;, &quot;SummitMarket&quot;, &quot;ThoreauRd&quot;],
+        locations: [&quot;HannaRdN&quot;, &quot;HannaRdS&quot;],
+        locations: [&quot;UniMall&quot;],
+        locations: [&#39;BlodgettGymWomensLocker&#39;,
+    &#39;BlodgettGymMensLocker&#39;],
+        locations: [&quot;YourDorm&quot;, &quot;LibraryMezzanine&quot;, &quot;RiversideMotelRoom&quot;],
+        nolocations: [&quot;Library&quot;, &quot;StudentParking&quot;],
+        locations: [&quot;FadogiaSt&quot;],
+        locationblocks: [&quot;Town&quot;],
+        locationblocks: [&quot;Campus&quot;],
+        locationblocks: [&quot;ResidenceHall&quot;],
+        locationblocks: [&quot;Campus&quot;, &quot;ResidenceHall&quot;],
 		
 Find NPC Among finds an NPC among a type of NPC
         findnpcamong: &quot;setup.people.people_of_type(&#39;student&#39;)&quot;,
@@ -737,7 +824,15 @@ Prereq highlights an event that must have been triggered prior to the event you&
 		
 Your skill must be at least this number to run this event
         skill: [&quot;Disinhibition&quot;, 2],
-		
+
+Your reputation must be at least this number to run this event
+        reputation: [&quot;promiscuity&quot;, 100],
+        reputation: [&quot;exhibitionism&quot;, 250],
+        reputation: [&quot;studiousness&quot;, 200],
+
+Add Relationship allows you to add relationship with NPC when event is run. 
+        addrelationship: [&quot;fuckbuddy&quot;],
+
 Relationship Type List
 	friend
 	best friend
@@ -912,8 +1007,13 @@ Start with:
         document.getElementById(&quot;output&quot;).value = outputValue;
     }
 
-    function toggleMarkdown() {
-        markdownEnabled = !markdownEnabled;
+    function toggleMarkdown(doEnable = null) {
+        if (doEnable === null) {
+            markdownEnabled = !markdownEnabled;
+        } else {
+            markdownEnabled = doEnable;
+        }
+        
         document.getElementById(&#39;output&#39;).style.display = markdownEnabled ? &#39;none&#39; : &#39;block&#39;;
         document.getElementById(&#39;preview&#39;).style.display = markdownEnabled ? &#39;block&#39; : &#39;none&#39;;
         updatePreview();
