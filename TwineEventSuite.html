@@ -420,27 +420,7 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
     }
 
 /*------------------------- PERCHANCE -------------------------*/
-    /* Attach an event listener to the send button */
-    $(document).on(&quot;click&quot;, &quot;#sendPrompt&quot;, function () {
-        /* Get the value of the input field */
-        const prompt = $(&quot;#userInput&quot;).val();
-        
-        /* Send the prompt to the parent window */
-        if (window.parent) {
-            window.parent.postMessage({ type: &quot;prompt&quot;, data: prompt }, &quot;*&quot;);
-        }
-    });
-
-    /* Listen for the response from the parent*/
-    window.addEventListener(&quot;message&quot;, function (event) {
-        if (event.data.type === &quot;textResponse&quot;) {
-            const output = event.data.data; /* Get the response data */
-
-            /* Display the response in the promptTextOutput div */
-            document.getElementById(&quot;output&quot;).value = output;
-        }
-    });
-
+    /* Generate AI via Twine */
     async function aiFunction({ instruction, onChunk }) {
         return new Promise((resolve) =&gt; {
             let accumulatedText = &quot;&quot;;
@@ -550,8 +530,8 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
 
         console.log(&quot;Output Text Value:&quot;, outputTextValue);
         // Set the value to the &lt;p&gt; element
-        if (returnvalue === false) document.getElementById(&quot;output&quot;).value = outputTextValue.generatedText;
-        return outputTextValue.generatedText;
+        if (returnvalue === false) document.getElementById(&quot;output&quot;).value = outputTextValue;
+        return outputTextValue;
     }
     
     function convertFull(inputVal = &quot;&quot;) {
