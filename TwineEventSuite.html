@@ -303,7 +303,7 @@ window.runCreator = function(text) {
         &lt;button onclick=&quot;pasteFromClipboard()&quot;&gt;Paste&lt;/button&gt;
     &lt;/div&gt;
     &lt;div class=&quot;buttons&quot;&gt;
-        &lt;button onclick=&quot;sendPrompt()&quot;&gt;Generate with AI&lt;/button&gt;
+        &lt;button onclick=&quot;sendPrompt(false, true)&quot;&gt;Generate with AI&lt;/button&gt;
         &lt;button onclick=&quot;convertFull()&quot;&gt;Convert to Full Mod&lt;/button&gt;
         &lt;button id=&quot;sendLargePrompt&quot; onclick=&quot;promptAndConvertToFull()&quot;&gt;Generate Full Mod&lt;/button&gt;
         &lt;button onclick=&quot;runCreator(document.getElementById(&#39;output&#39;).value)&quot;&gt;Run&lt;/button&gt;
@@ -496,7 +496,7 @@ window.runCreator = function(text) {
     }
 /*------------------------- PERCHANCE -------------------------*/
 
-    async function sendPrompt(returnValue = false) {
+    async function sendPrompt(returnValue = false, onPerchance = false) {
       // Get the value from the input field
       var inputValue = document.getElementById(&quot;userInput&quot;).value;
       if (returnValue === false) document.getElementById(&quot;output&quot;).value = &quot;&quot;;
@@ -556,13 +556,25 @@ window.runCreator = function(text) {
         // When posting to perchance.org/tps-cot-auto-text-converter#edit, do let outputTextValue = await ai({...
         // When putting back to twee, do let outputTextValue = null; outputTextValue.generatedText = await aiFunction({...
         let outputTextValue = null;
-        outputTextValue.generatedText = await aiFunction({ 
-            instruction: instruction,
-            onChunk: function(data) {
-                console.log(data);
-                document.getElementById(&quot;output&quot;).value = data.fullTextSoFar;
-            },
-        });
+        if (onPerchance === true) {
+            // If onPerchance is true, call the ai function
+            outputTextValue = await ai({ 
+                instruction: instruction,
+                onChunk: function(data) {
+                    console.log(data);
+                    // document.getElementById(&quot;output&quot;).value += data.fullTextSoFar;
+                },
+            });
+        } else if (onPerchance === false) {
+            // If onPerchance is false, call aiFunction
+            outputTextValue.generatedText = await aiFunction({ 
+                instruction: instruction,
+                onChunk: function(data) {
+                    console.log(data);
+                    // document.getElementById(&quot;output&quot;).value += data.fullTextSoFar;
+                },
+            });
+        }
 
         console.log(&quot;Output Text Value:&quot;, outputTextValue.generatedText);
         // Set the value to the &lt;p&gt; element
@@ -574,7 +586,7 @@ window.runCreator = function(text) {
       // Get the value from the input field
       var inputValue = document.getElementById(&quot;userInput&quot;).value;
       let outputTextValue = null;
-      if (returnValue === false) document.getElementById(&quot;output&quot;).value = &quot;\n\nAdd Javascript: \nsetup.Events.db.push(&quot;;
+      if (returnValue === false) document.getElementById(&quot;output&quot;).value += &quot;\n\nAdd Javascript: \nsetup.Events.db.push(&quot;;
       if (returnValue === true) outputTextValue = &quot;\n\nAdd Javascript: \nsetup.Events.db.push(&quot;;
       
       instruction = `
@@ -593,6 +605,23 @@ EVENT TRIGGER:
         frequency: 100,
         findnpc: {employee: true, gender: [&quot;male&quot;, &quot;transgender male&quot;, &quot;nonbinary amab&quot;, &quot;nonbinary afab&quot;]},
     },
+
+The passage property, which indicates the passage to play. Use the name specified after &#39;Title:&#39;
+        passage: &quot;EventDiningHallOgle&quot;,
+
+Tags, besides passage property, is the most important. Again, it determines the list of possible events that can be played. However, tags are EXTREMELY STRICT, so ONLY use them if your event matches, or else, leave the propety like this: tags: []
+	Summit Market Job Events
+		tags: [&quot;job&quot;, &quot;dining hall&quot;],
+	Eating at QuickieBurger Events
+        tags: [&quot;QuickieBurger eat&quot;],
+	Working at QuickieBurger Front Events
+        tags: [&quot;job&quot;, &quot;QuickieBurger&quot;, &quot;front&quot;],
+	Working at QuickieBurger Window Events
+        tags: [&quot;job&quot;, &quot;QuickieBurger&quot;, &quot;window&quot;],
+	Shower Events
+        tags: [&quot;shower&quot;, &quot;normal&quot;],
+	Restroom Events
+        tags: [&quot;restroom&quot;],
 
 Checkvar allows you to check run a specific condition to trigger the event. Some Examples of Checkvar Usage are below.
         checkvar: &quot;setup.Needs.get_need(&#39;rest&#39;) lt 500&quot;,
@@ -633,20 +662,6 @@ Prereq highlights an event that must have been triggered prior to the event you&
 		
 Your skill must be at least this number to run this event
         skill: [&quot;Disinhibition&quot;, 2],
-		
-Tags Dictionary
-	Summit Market Job Events
-		tags: [&quot;job&quot;, &quot;dining hall&quot;],
-	Eating at QuickieBurger Events
-        tags: [&quot;QuickieBurger eat&quot;],
-	Working at QuickieBurger Front Events
-        tags: [&quot;job&quot;, &quot;QuickieBurger&quot;, &quot;front&quot;],
-	Working at QuickieBurger Window Events
-        tags: [&quot;job&quot;, &quot;QuickieBurger&quot;, &quot;window&quot;],
-	Shower Events
-        tags: [&quot;shower&quot;, &quot;normal&quot;],
-	Restroom Events
-        tags: [&quot;restroom&quot;],
 		
 Relationship Type List
 	friend
@@ -689,11 +704,17 @@ Skills List
 	Studying
 	Cooking
 
-The official formatting we&#39;re going to use is as follows:
+Make sure to use the following required properties: passage: 
 
-	
+only use 3 or 5 properties of the following properties:
+
 Instruction:
 Create an Event Trigger for the following Event: ${inputValue}
+Start with: 
+{
+    passage: 
+    tags: [
+    frequency: 
       `
         // When posting to perchance.org/tps-cot-auto-text-converter#edit, do let outputTextValue = await ai({...
         // When putting back to twee, do let outputTextValue = null; outputTextValue.generatedText = await aiFunction({...
@@ -726,7 +747,7 @@ Create an Event Trigger for the following Event: ${inputValue}
             }
         }
 
-        if (aiEnabled === false) {
+        if (aiEnabled === true) {
             if (returnValue === false) document.getElementById(&quot;output&quot;).value += outputText.generatedText + &quot;);&quot;;
             if (returnValue === true) outputTextValue + outputText.generatedText + &quot;);&quot;
         } else {
@@ -799,8 +820,7 @@ Create an Event Trigger for the following Event: ${inputValue}
             output += passageContent + &quot;&lt;/tw-passagedata&gt;\n&quot;;
         }
 
-
-        if (!inputVal || inputVal === &quot;&quot;) document.getElementById(&quot;output&quot;).value = finalOutput;
+        if (!inputVal || inputVal === &quot;&quot;) document.getElementById(&quot;output&quot;).value = output;
         return output;
     }
 
@@ -808,7 +828,7 @@ Create an Event Trigger for the following Event: ${inputValue}
         let outputValue = await sendPrompt(true);
         outputValue = convertCOTText(outputValue);
         outputValue = convertFull(outputValue);
-        sendTriggerPrompt(true);
+        outputValue += sendTriggerPrompt(true);
         console.log(&quot;Generated Text:&quot;, outputValue);
         document.getElementById(&quot;output&quot;).value = outputValue;
     }
