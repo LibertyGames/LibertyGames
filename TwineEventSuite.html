@@ -338,7 +338,7 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
             document.getElementById(&quot;userInput&quot;).value = text;
         });
     }
-    
+
     window.addEventListener(&quot;message&quot;, async function(event) {
         if (event.data.type === &quot;prompt&quot;) {
             const prompt = event.data.data;
@@ -434,7 +434,19 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
 
         return inputText;
     }
-    
+
+    // Listen for messages from the parent
+    window.addEventListener(&quot;message&quot;, (event) =&gt; {
+    if (event.data.type === &quot;sendAI&quot;) {
+        // Now `aiFunction` is available in the iframe
+        const aiFunction = event.data.aiFunction;
+        
+        // You can now call the AI function inside the iframe
+        async function sendPrompt(returnvalue = false) {
+        }
+    }
+    });
+
     async function sendPrompt(returnvalue = false) {
       // Get the value from the input field
       var inputValue = document.getElementById(&quot;userInput&quot;).value;
@@ -492,18 +504,19 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
   
   Start with Title: Evemt[event name here, no spaces] + new line + &lt;&lt;dialogue &quot;start&quot;&gt;&gt;. No other code goes before it. End with &lt;&lt;/dialogue&gt;&gt;. No other code goes after it. I want a minimum of 20 dialogues.
       `
-  
-      let outputTextValue = await ai({
-        instruction: instruction,
-        onChunk: function(data) {
-          document.getElementById(&quot;output&quot;).value = data.fullTextSoFar;
-        },
-      });
+    
+        let outputTextValue = await aiFunction({
+            instruction: instruction,
+            onChunk: function(data) {
+                console.log(data);
+                document.getElementById(&quot;output&quot;).value = data.fullTextSoFar;
+            },
+        });
 
-      console.log(&quot;Output Text Value:&quot;, outputTextValue);
-      // Set the value to the &lt;p&gt; element
-      if (returnvalue === false) document.getElementById(&quot;output&quot;).value = outputTextValue.generatedText;
-      return outputTextValue.generatedText;
+        console.log(&quot;Output Text Value:&quot;, outputTextValue);
+        // Set the value to the &lt;p&gt; element
+        if (returnvalue === false) document.getElementById(&quot;output&quot;).value = outputTextValue.generatedText;
+        return outputTextValue.generatedText;
     }
     
     function convertFull(inputVal = &quot;&quot;) {
@@ -574,11 +587,11 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
     }
 
     async function promptAndConvertToFull() {
-      let outputValue = await sendPrompt(true);
-      outputValue = convertCOTText(outputValue);
-      outputValue = convertFull(outputValue);
-      console.log(&quot;Generated Text:&quot;, outputValue);
-      document.getElementById(&quot;output&quot;).value = outputValue;
+        let outputValue = await sendPrompt(true);
+        outputValue = convertCOTText(outputValue);
+        outputValue = convertFull(outputValue);
+        console.log(&quot;Generated Text:&quot;, outputValue);
+        document.getElementById(&quot;output&quot;).value = outputValue;
     }
 &lt;/script&gt;
 &lt;style&gt;
