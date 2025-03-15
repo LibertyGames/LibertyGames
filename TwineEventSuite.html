@@ -294,7 +294,7 @@ window.runCreator = function(text) {
     &lt;div class=&quot;text-areas&quot;&gt;
         &lt;textarea id=&quot;userInput&quot; placeholder=&quot;Type something...&quot;&gt;&lt;/textarea&gt;
         &lt;script&gt;document.getElementById(&quot;userInput&quot;).value = `Title: EventIceCreamFight\nNow, I want you to make an event where you and Amanda get into a fight over who&#39;s ice cream flavor is better.`;&lt;/script&gt;
-        &lt;textarea id=&quot;output&quot;&gt;&lt;/textarea&gt;
+        &lt;textarea id=&quot;output&quot; oninput=&quot;updatePreview()&quot;&gt;&lt;/textarea&gt;
         &lt;div id=&quot;loader&quot; class=&quot;loader&quot;&gt;&lt;/div&gt;
         &lt;script&gt;document.getElementById(&quot;output&quot;).value = window.outputInput ? window.outputInput : &quot;&quot;;&lt;/script&gt;
         &lt;div id=&quot;preview&quot; class=&quot;preview&quot;&gt;&lt;/div&gt;
@@ -560,12 +560,11 @@ window.runCreator = function(text) {
             });
         }
         toggleLoader(false);
-        toggleMarkdown();
 
         console.log(&quot;Output Text Value:&quot;, outputTextValue.generatedText);
         // Set the value to the &lt;p&gt; element
         if (returnValue === false) document.getElementById(&quot;output&quot;).value = outputTextValue.generatedText;
-        markdownEnabled = true;
+        toggleMarkdown();
         return outputTextValue.generatedText;
     }
 
@@ -964,7 +963,7 @@ Start with:
         width: 100%;
         gap: 20px;
     }
-    textarea {
+    textarea, .preview {
         width: 100%;
         height: 400px;
         border-radius: 8px;
@@ -974,6 +973,12 @@ Start with:
         color: white;
         resize: none;
         font-size: 16px;
+    }
+    .preview {
+        border: 1px solid #333;
+        display: none;
+        height: 400px;  /* Set the same height as the textarea */
+        overflow-y: auto; /* Enable scrolling if content overflows */
     }
     .buttons {
         display: flex;
