@@ -550,6 +550,7 @@ window.runCreator = function(text) {
             });
         } else if (onPerchance === false) {
             // If onPerchance is false, call aiFunction
+            outputTextValue = {};
             outputTextValue.generatedText = await aiFunction({ 
                 instruction: instruction,
                 onChunk: function(data) {
@@ -640,6 +641,7 @@ window.runCreator = function(text) {
             });
         } else if (onPerchance === false) {
             // If onPerchance is false, call aiFunction
+            outputTextValue = {};
             outputTextValue.generatedText = await aiFunction({ 
                 instruction: instruction,
                 onChunk: function(data) {
@@ -812,6 +814,7 @@ Start with:
                 });
             } else if (onPerchance === false) {
                 // If onPerchance is false, call aiFunction
+                outputText = {};
                 outputText.generatedText = await aiFunction({ 
                     instruction: instruction,
                     onChunk: function(data) {
@@ -1001,7 +1004,8 @@ Start with:
     .loader {
         border: 16px solid #f3f3f3;
         border-radius: 50%;
-        border-top: 16px solid #3498db;
+        border-top: 16px solid grey;
+        /* border-bottom: 16px solid grey; */
         width: 50px;
         height: 50px;
         position: absolute;
