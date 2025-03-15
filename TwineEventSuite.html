@@ -252,9 +252,25 @@ window.dialogueContent = `
 <</dialogue>>`;
 
 window.runCreator = function(text) {
-	dialogueContent = text;
-  	SugarCube.Engine.play("Start");
-}
+    // Regular expression to extract content inside <tw-passagedata> tags
+    const passageMatch = text.match(/<tw-passagedata[^>]*size="[^"]*"[^>]*>([\s\S]*?)<\/tw-passagedata>/);
+
+    if (passageMatch) {
+        // Extracted passage content
+        const passageContent = passageMatch[1].trim();
+
+        // Set dialogueContent to the extracted passage content
+        dialogueContent = passageContent;
+
+        // Set outputInput to the extracted passage content as well (assuming you want a separate variable)
+        window.outputInput = passageContent;
+
+        // Start the game with the extracted dialogue content
+        SugarCube.Engine.play("Start");
+    } else {
+        console.error("No valid <tw-passagedata> found in input text.");
+    }
+};
 
 // Inject the content into the Start passage
 // SugarCube.Story.get("Start").text = dialogueContent;
@@ -316,7 +332,7 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
 &lt;/div&gt;
 &lt;script&gt;
     window.originalText = &quot;&quot;;
-    console.log(&quot;Version 0.0.4&quot;);
+    console.log(&quot;Version 0.0.5&quot;);
 
     function convertText() {
         let inputText = document.getElementById(&quot;userInput&quot;).value;
