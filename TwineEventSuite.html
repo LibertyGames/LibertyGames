@@ -443,26 +443,41 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
 
     async function aiFunction({ instruction, onChunk }) {
         return new Promise((resolve) =&gt; {
+            let accumulatedText = &quot;&quot;;
+
             // Send the instruction to the parent window
             window.parent.postMessage({ type: &quot;prompt&quot;, data: instruction }, &quot;*&quot;);
 
-            // Listen for the response from the parent
-            function handleMessage(event) {
-                if (event.data.type === &quot;textResponse&quot;) {
-                    // Call the onChunk function if provided
+            // Listen for streamed chunks from the parent
+            function handleChunkMessage(event) {
+                if (event.data.type === &quot;textChunk&quot;) {
+                    accumulatedText = event.data.data; // Update accumulated text
+
                     if (onChunk) {
-                        onChunk({ fullTextSoFar: event.data.data });
+                        onChunk({ fullTextSoFar: accumulatedText });
                     }
-
-                    // Resolve the promise with the received text
-                    resolve(event.data.data);
-
-                    // Remove event listener after receiving the response
-                    window.removeEventListener(&quot;message&quot;, handleMessage);
                 }
             }
 
-            window.addEventListener(&quot;message&quot;, handleMessage);
+            // Listen for the final response
+            function handleFinalMessage(event) {
+                if (event.data.type === &quot;textResponse&quot;) {
+                    accumulatedText = event.data.data; // Ensure final text is stored
+
+                    if (onChunk) {
+                        onChunk({ fullTextSoFar: accumulatedText });
+                    }
+
+                    resolve(accumulatedText);
+
+                    // Clean up listeners
+                    window.removeEventListener(&quot;message&quot;, handleChunkMessage);
+                    window.removeEventListener(&quot;message&quot;, handleFinalMessage);
+                }
+            }
+
+            window.addEventListener(&quot;message&quot;, handleChunkMessage);
+            window.addEventListener(&quot;message&quot;, handleFinalMessage);
         });
     }
 /*------------------------- PERCHANCE -------------------------*/
