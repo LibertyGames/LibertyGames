@@ -828,7 +828,7 @@ Start with:
         let outputValue = await sendPrompt(true);
         outputValue = convertCOTText(outputValue);
         outputValue = convertFull(outputValue);
-        outputValue += sendTriggerPrompt(true);
+        outputValue += await sendTriggerPrompt(true);
         console.log(&quot;Generated Text:&quot;, outputValue);
         document.getElementById(&quot;output&quot;).value = outputValue;
     }
