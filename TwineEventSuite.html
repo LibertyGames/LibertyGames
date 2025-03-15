@@ -749,7 +749,7 @@ Start with:
 
         if (aiEnabled === true) {
             if (returnValue === false) document.getElementById(&quot;output&quot;).value += outputText.generatedText + &quot;);&quot;;
-            if (returnValue === true) outputTextValue + outputText.generatedText + &quot;);&quot;
+            if (returnValue === true) outputTextValue += outputText.generatedText + &quot;);&quot;
         } else {
             if (returnValue === false) document.getElementById(&quot;output&quot;).value += &quot;);&quot;;
             if (returnValue === true) outputTextValue += &quot;);&quot;;
