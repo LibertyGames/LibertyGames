@@ -280,9 +280,10 @@ window.runCreator = function(text) {
 // SugarCube.Engine.play("Start");</script><tw-passagedata pid="1" name="Creator" tags="" position="1250,350" size="100,100">&lt;div class=&quot;container&quot;&gt;
     &lt;h2&gt;Course of Temptation Auto Text Converter&lt;/h2&gt;
     &lt;div class=&quot;text-areas&quot;&gt;
-        &lt;textarea id=&quot;userInput&quot; placeholder=&quot;Type something...&quot;&gt;Title: EventIceCreamFight
-Now, I want you to make an event where you and Amanda get into a fight over who&#39;s ice cream flavor is better.&lt;/textarea&gt;
+        &lt;textarea id=&quot;userInput&quot; placeholder=&quot;Type something...&quot;&gt;&lt;/textarea&gt;
+        &lt;script&gt;document.getElementById(&quot;userInput&quot;).value = `Title: EventIceCreamFight\nNow, I want you to make an event where you and Amanda get into a fight over who&#39;s ice cream flavor is better.`;&lt;/script&gt;
         &lt;textarea id=&quot;output&quot;&gt;&lt;/textarea&gt;
+        &lt;script&gt;document.getElementById(&quot;output&quot;).value = window.outputInput ? window.outputInput : &quot;&quot;;&lt;/script&gt;
     &lt;/div&gt;
     &lt;div class=&quot;buttons&quot;&gt;
         &lt;button onclick=&quot;convertText()&quot;&gt;Convert&lt;/button&gt;
