@@ -288,13 +288,16 @@ window.runCreator = function(text) {
 // SugarCube.Story.get("Start").text = dialogueContent;
 
 // Play the Start passage
-// SugarCube.Engine.play("Start");</script><tw-passagedata pid="1" name="Creator" tags="" position="1250,350" size="100,100">&lt;div class=&quot;container&quot;&gt;
+// SugarCube.Engine.play("Start");</script><tw-passagedata pid="1" name="Creator" tags="" position="1250,350" size="100,100">&lt;script src=&quot;https://cdn.jsdelivr.net/npm/marked/marked.min.js&quot;&gt;&lt;/script&gt;
+&lt;div class=&quot;container&quot;&gt;
     &lt;h2&gt;Course of Temptation Auto Text Converter&lt;/h2&gt;
     &lt;div class=&quot;text-areas&quot;&gt;
         &lt;textarea id=&quot;userInput&quot; placeholder=&quot;Type something...&quot;&gt;&lt;/textarea&gt;
         &lt;script&gt;document.getElementById(&quot;userInput&quot;).value = `Title: EventIceCreamFight\nNow, I want you to make an event where you and Amanda get into a fight over who&#39;s ice cream flavor is better.`;&lt;/script&gt;
         &lt;textarea id=&quot;output&quot;&gt;&lt;/textarea&gt;
+        &lt;div id=&quot;loader&quot; class=&quot;loader&quot;&gt;&lt;/div&gt;
         &lt;script&gt;document.getElementById(&quot;output&quot;).value = window.outputInput ? window.outputInput : &quot;&quot;;&lt;/script&gt;
+        &lt;div id=&quot;preview&quot; class=&quot;preview&quot;&gt;&lt;/div&gt;
     &lt;/div&gt;
     &lt;div class=&quot;buttons&quot;&gt;
         &lt;button onclick=&quot;convertText()&quot;&gt;Convert&lt;/button&gt;
@@ -303,15 +306,16 @@ window.runCreator = function(text) {
         &lt;button onclick=&quot;pasteFromClipboard()&quot;&gt;Paste&lt;/button&gt;
     &lt;/div&gt;
     &lt;div class=&quot;buttons&quot;&gt;
-        &lt;button onclick=&quot;sendPrompt(false)&quot;&gt;Generate with AI&lt;/button&gt;
+        &lt;button onclick=&quot;sendEventPrompt(false)&quot;&gt;Generate with AI&lt;/button&gt;
         &lt;button onclick=&quot;convertFull()&quot;&gt;Convert to Full Mod&lt;/button&gt;
         &lt;button id=&quot;sendLargePrompt&quot; onclick=&quot;promptAndConvertToFull()&quot;&gt;Generate Full Mod&lt;/button&gt;
         &lt;button onclick=&quot;runCreator(document.getElementById(&#39;output&#39;).value)&quot;&gt;Run&lt;/button&gt;
     &lt;/div&gt;
     &lt;div class=&quot;buttons&quot;&gt;
+        &lt;button onclick=&quot;sendPrompt(false)&quot;&gt;Send Regular Prompt&lt;/button&gt;
         &lt;button onclick=&quot;sendTriggerPrompt(false, false)&quot;&gt;Generate Event Trigger&lt;/button&gt;
         &lt;button onclick=&quot;sendTriggerPrompt(false)&quot;&gt;Generate Event Trigger with AI&lt;/button&gt;
-        &lt;button onclick=&quot;convertFull()&quot;&gt;Convert to Full Mod&lt;/button&gt;
+        &lt;button onclick=&quot;toggleMarkdown()&quot;&gt;Toggle Markdown&lt;/button&gt;
     &lt;/div&gt;
     &lt;div class=&quot;instructions&quot;&gt;
       &lt;p&gt;&lt;strong&gt;Instructions:&lt;/strong&gt;&lt;/p&gt;
@@ -350,6 +354,7 @@ window.runCreator = function(text) {
 &lt;/div&gt;
 &lt;script&gt;
     window.originalText = &quot;&quot;;
+    window.markdownEnabled = false;
     console.log(&quot;Version 0.0.5&quot;);
 
     function convertText() {
@@ -372,6 +377,20 @@ window.runCreator = function(text) {
         navigator.clipboard.readText().then(text =&gt; {
             document.getElementById(&quot;userInput&quot;).value = text;
         });
+    }
+
+    function toggleLoader(isOn) {
+        const loader = document.getElementById(&#39;loader&#39;);
+        const textarea = document.getElementById(&#39;output&#39;);
+
+        if (isOn) {
+            loader.style.display = &#39;block&#39;; // Show the loader
+            textarea.value = &#39;&#39;; // Clear the textarea content
+            textarea.disabled = true; // Disable textarea while loading
+        } else {
+            loader.style.display = &#39;none&#39;; // Hide the loader
+            textarea.disabled = false; // Enable textarea after loading
+        }
     }
 
     function convertCOTText(inputText) {
@@ -502,6 +521,59 @@ window.runCreator = function(text) {
       if (returnValue === false) document.getElementById(&quot;output&quot;).value = &quot;&quot;;
   
       instruction = `
+    You are an assistant for question-answering tasks. Use the following pieces of retrieved context only to answer the question. Answers should be relevant to the questions. Donot provide any irrelavant answers. Unless the user explicitly wants a long answer, use three sentences maximum and keep the answer consice.
+    Use markdown formatting for clean and easy to read responses. Your responses must be well-structured and easy to read. Use the following Markdown elements appropriately:
+
+    **bold** for emphasis
+    *italics* for subtle emphasis
+    ### Headings for section organization
+    Lists using - or 1.
+    Code blocks using triple backticks for multi-line code
+    Inline code using single backticks for short snippets
+    Always ensure proper spacing and insert line breaks after headings, lists, and paragraphs to maintain readability. When providing code, always wrap it in proper Markdown code blocks.
+
+    Do not include unnecessary text before or after your responses—just return the correctly formatted Markdown output.
+    Instruction: ${inputValue}
+      `
+      toggleLoader(true);
+        // When posting to perchance.org/tps-cot-auto-text-converter#edit, do let outputTextValue = await ai({...
+        // When putting back to twee, do let outputTextValue = null; outputTextValue.generatedText = await aiFunction({...
+        let outputTextValue = null;
+        if (onPerchance === true) {
+            // If onPerchance is true, call the ai function
+            outputTextValue = await ai({ 
+                instruction: instruction,
+                onChunk: function(data) {
+                    console.log(data);
+                    // document.getElementById(&quot;output&quot;).value += data.fullTextSoFar;
+                },
+            });
+        } else if (onPerchance === false) {
+            // If onPerchance is false, call aiFunction
+            outputTextValue.generatedText = await aiFunction({ 
+                instruction: instruction,
+                onChunk: function(data) {
+                    console.log(data);
+                    // document.getElementById(&quot;output&quot;).value += data.fullTextSoFar;
+                },
+            });
+        }
+        toggleLoader(false);
+        toggleMarkdown();
+
+        console.log(&quot;Output Text Value:&quot;, outputTextValue.generatedText);
+        // Set the value to the &lt;p&gt; element
+        if (returnValue === false) document.getElementById(&quot;output&quot;).value = outputTextValue.generatedText;
+        markdownEnabled = true;
+        return outputTextValue.generatedText;
+    }
+
+    async function sendEventPrompt(returnValue = false, onPerchance = false) {
+      // Get the value from the input field
+      var inputValue = document.getElementById(&quot;userInput&quot;).value;
+      if (returnValue === false) document.getElementById(&quot;output&quot;).value = &quot;&quot;;
+  
+      instruction = `
   AI Dialogue System Event Creation Please follow the instructions below to create a branching dialogue system event using the syntax provided. The goal is to generate branching dialogue paths that react to the player’s choices and utilize conditions based on variables.
   
   Make sure to use CLEAN and EASY TO READ formatting with indents and line breaks in the appropriate places.
@@ -553,6 +625,7 @@ window.runCreator = function(text) {
   
   Start with Title: Evemt[event name here, no spaces] + new line + &lt;&lt;dialogue &quot;start&quot;&gt;&gt;. No other code goes before it. End with &lt;&lt;/dialogue&gt;&gt;. No other code goes after it. I want a minimum of 20 dialogues.
       `
+        toggleLoader(true);
         // When posting to perchance.org/tps-cot-auto-text-converter#edit, do let outputTextValue = await ai({...
         // When putting back to twee, do let outputTextValue = null; outputTextValue.generatedText = await aiFunction({...
         let outputTextValue = null;
@@ -575,6 +648,7 @@ window.runCreator = function(text) {
                 },
             });
         }
+        toggleLoader(false);
 
         console.log(&quot;Output Text Value:&quot;, outputTextValue.generatedText);
         // Set the value to the &lt;p&gt; element
@@ -716,6 +790,7 @@ Start with:
     tags: [
     frequency: 
       `
+        toggleLoader(true);
         // When posting to perchance.org/tps-cot-auto-text-converter#edit, do let outputTextValue = await ai({...
         // When putting back to twee, do let outputTextValue = null; outputTextValue.generatedText = await aiFunction({...
 
@@ -746,6 +821,7 @@ Start with:
                 });
             }
         }
+        toggleLoader(false);
 
         if (aiEnabled === true) {
             if (returnValue === false) document.getElementById(&quot;output&quot;).value += outputText.generatedText + &quot;);&quot;;
@@ -826,20 +902,36 @@ Start with:
 
     async function promptAndConvertToFull() {
         document.getElementById(&quot;output&quot;).value = &quot;&quot;;
-        let outputValue = await sendPrompt(true);
+        let outputValue = await sendEventPrompt(true);
         outputValue = convertCOTText(outputValue);
         outputValue = convertFull(outputValue);
         outputValue += await sendTriggerPrompt(true);
         console.log(&quot;Generated Text:&quot;, outputValue);
         document.getElementById(&quot;output&quot;).value = outputValue;
     }
+
+    function toggleMarkdown() {
+        markdownEnabled = !markdownEnabled;
+        document.getElementById(&#39;output&#39;).style.display = markdownEnabled ? &#39;none&#39; : &#39;block&#39;;
+        document.getElementById(&#39;preview&#39;).style.display = markdownEnabled ? &#39;block&#39; : &#39;none&#39;;
+        updatePreview();
+    }
+
+    function updatePreview() {
+        if (markdownEnabled) {
+            const markdownText = document.getElementById(&#39;output&#39;).value;
+            document.getElementById(&#39;preview&#39;).innerHTML = marked.parse(markdownText);
+        }
+    }
 &lt;/script&gt;
 &lt;style&gt;
     body {
         font-family: Arial, sans-serif;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
+        display: flex;  /* Use flexbox to center content */
+        justify-content: center; /* Center horizontally */
+        align-items: flex-start; /* Align at the top */
+        height: 100%; /* Allow the body to take up the full height */
+        margin: 0; /* Remove default margin */
         background-color: #121212;
         color: white;
     }
@@ -861,6 +953,7 @@ Start with:
         display: flex;
         flex-direction: column;
         align-items: center;
+        margin: 0 auto;
     }
     .text-areas {
         display: flex;
@@ -898,12 +991,35 @@ Start with:
     button:hover {
         background: #0056b3;
     }
-  .instructions {
+    .instructions {
         height: 300px; /* Limit the height to 20% of the container */
         overflow-y: auto; /* Add a vertical scrollbar when content overflows */
         width: 100%; /* Ensure it spans the full width of the container */
         padding: 10px; /* Optional: Add padding if you want some space around the content */
         box-sizing: border-box; /* Ensures padding doesn&#39;t affect the height calculation */
+    }
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 50px;
+        height: 50px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        -webkit-animation: spin 1s linear infinite; /* Safari */
+        animation: spin 1s linear infinite; /* Faster spin */
+        display: none; /* Hidden by default */
+    }
+    /* Safari */
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 &lt;/style&gt;</tw-passagedata><tw-passagedata pid="2" name="Macros" tags="nobr" position="0,0" size="100,100">&lt;&lt;widget &quot;anonorfirstname&quot;&gt;&gt;
     Amon
