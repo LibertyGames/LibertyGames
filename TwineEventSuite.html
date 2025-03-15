@@ -290,14 +290,18 @@ window.runCreator = function(text) {
 // Play the Start passage
 // SugarCube.Engine.play("Start");</script><tw-passagedata pid="1" name="Creator" tags="" position="1250,350" size="100,100">&lt;script src=&quot;https://cdn.jsdelivr.net/npm/marked/marked.min.js&quot;&gt;&lt;/script&gt;
 &lt;div class=&quot;container&quot;&gt;
-    &lt;script&gt;window.onPerchance = false&lt;/script&gt;
+    &lt;script&gt;
+        window.onPerchance = false
+    &lt;/script&gt;
     &lt;h2&gt;Course of Temptation Auto Text Converter&lt;/h2&gt;
     &lt;div class=&quot;text-areas&quot;&gt;
         &lt;textarea id=&quot;userInput&quot; placeholder=&quot;Type something...&quot;&gt;&lt;/textarea&gt;
         &lt;script&gt;document.getElementById(&quot;userInput&quot;).value = `Title: EventIceCreamFight\nNow, I want you to make an event where you and Amanda get into a fight over who&#39;s ice cream flavor is better.`;&lt;/script&gt;
         &lt;textarea id=&quot;output&quot; oninput=&quot;updatePreview()&quot;&gt;&lt;/textarea&gt;
         &lt;div id=&quot;loader&quot; class=&quot;loader&quot;&gt;&lt;/div&gt;
-        &lt;script&gt;document.getElementById(&quot;output&quot;).value = window.outputInput ? window.outputInput : &quot;&quot;;&lt;/script&gt;
+        &lt;script&gt;
+            document.getElementById(&quot;output&quot;).value = window.outputInput ? window.outputInput : &quot;&quot;;
+        &lt;/script&gt;
         &lt;div id=&quot;preview&quot; class=&quot;preview&quot;&gt;&lt;/div&gt;
     &lt;/div&gt;
     &lt;div class=&quot;buttons&quot;&gt;
@@ -310,7 +314,10 @@ window.runCreator = function(text) {
         &lt;button onclick=&quot;sendEventPrompt(false); toggleMarkdown(false);&quot;&gt;Generate with AI&lt;/button&gt;
         &lt;button onclick=&quot;convertFull(); toggleMarkdown(false);&quot;&gt;Convert to Full Mod&lt;/button&gt;
         &lt;button id=&quot;sendLargePrompt&quot; onclick=&quot;promptAndConvertToFull(); toggleMarkdown(false);&quot;&gt;Generate Full Mod&lt;/button&gt;
-        &lt;button onclick=&quot;runCreator(document.getElementById(&#39;output&#39;).value)&quot; {{ onPerchance ? &#39;disabled&#39; : &#39;&#39; }}&gt;Run&lt;/button&gt;
+        &lt;button id=&quot;runButton&quot; onclick=&quot;runCreator(document.getElementById(&#39;output&#39;).value)&quot;&gt;Run&lt;/button&gt;
+        &lt;script&gt;
+            document.getElementById(&#39;runButton&#39;).disabled = onPerchance;
+        &lt;/script&gt;
     &lt;/div&gt;
     &lt;div class=&quot;buttons&quot;&gt;
         &lt;button onclick=&quot;sendPrompt(false)&quot;&gt;Send Regular Prompt&lt;/button&gt;
