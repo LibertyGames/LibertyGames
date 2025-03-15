@@ -269,7 +269,18 @@ window.runCreator = function(text) {
         // Start the game with the extracted dialogue content
         SugarCube.Engine.play("Start");
     } else {
-        console.error("No valid <tw-passagedata> found in input text.");
+        // Extracted passage content
+        const passageContent = text;
+        console.log("New Passage Content:", passageContent);
+
+        // Set dialogueContent to the extracted passage content
+        dialogueContent = passageContent;
+
+        // Set outputInput to the extracted passage content as well (assuming you want a separate variable)
+        window.outputInput = passageContent;
+
+        // Start the game with the extracted dialogue content
+        SugarCube.Engine.play("Start");
     }
 };
 
