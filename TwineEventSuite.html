@@ -820,11 +820,12 @@ Start with:
             output += passageContent + &quot;&lt;/tw-passagedata&gt;\n&quot;;
         }
 
-        if (!inputVal || inputVal === &quot;&quot;) document.getElementById(&quot;output&quot;).value = output;
+        if (inputVal === &quot;&quot;) document.getElementById(&quot;output&quot;).value = output;
         return output;
     }
 
     async function promptAndConvertToFull() {
+        document.getElementById(&quot;output&quot;).value = &quot;&quot;;
         let outputValue = await sendPrompt(true);
         outputValue = convertCOTText(outputValue);
         outputValue = convertFull(outputValue);
