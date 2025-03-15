@@ -338,6 +338,23 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
             document.getElementById(&quot;userInput&quot;).value = text;
         });
     }
+    
+    window.addEventListener(&quot;message&quot;, async function(event) {
+        if (event.data.type === &quot;prompt&quot;) {
+            const prompt = event.data.data;
+
+            // Run the AI function when the prompt is received
+            let outputTextValue = await ai({
+                instruction: prompt,
+                onChunk: function(data) {
+                    document.getElementById(&quot;output&quot;).value = data.fullTextSoFar;
+                },
+            });
+
+            // Send the output back to the parent page
+            window.parent.postMessage({ type: &quot;textResponse&quot;, data: outputTextValue }, &quot;*&quot;);
+        }
+    });
 
     function convertCOTText(inputText) {
         const nameReplacements = {
