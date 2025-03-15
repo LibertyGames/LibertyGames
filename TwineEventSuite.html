@@ -316,6 +316,7 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
 &lt;/div&gt;
 &lt;script&gt;
     window.originalText = &quot;&quot;;
+    console.log(&quot;Version 0.0.1&quot;);
 
     function convertText() {
         let inputText = document.getElementById(&quot;userInput&quot;).value;
@@ -498,14 +499,14 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
   
   Start with Title: Evemt[event name here, no spaces] + new line + &lt;&lt;dialogue &quot;start&quot;&gt;&gt;. No other code goes before it. End with &lt;&lt;/dialogue&gt;&gt;. No other code goes after it. I want a minimum of 20 dialogues.
       `
-    
+        /*
         let outputTextValue = await aiFunction({
             instruction: instruction,
             onChunk: function(data) {
                 console.log(data);
                 document.getElementById(&quot;output&quot;).value = data.fullTextSoFar;
             },
-        });
+        });*/
 
         console.log(&quot;Output Text Value:&quot;, outputTextValue);
         // Set the value to the &lt;p&gt; element
