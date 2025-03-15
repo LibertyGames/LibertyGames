@@ -258,6 +258,7 @@ window.runCreator = function(text) {
     if (passageMatch) {
         // Extracted passage content
         const passageContent = passageMatch[1].trim();
+        console.log("New Passage Content:", passageContent);
 
         // Set dialogueContent to the extracted passage content
         dialogueContent = passageContent;
