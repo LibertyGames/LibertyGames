@@ -274,9 +274,9 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
         &lt;button onclick=&quot;pasteFromClipboard()&quot;&gt;Paste&lt;/button&gt;
     &lt;/div&gt;
     &lt;div class=&quot;buttons&quot;&gt;
-        &lt;button onclick=&quot;sendPrompt()&quot;&gt;Generate with AI&lt;/button&gt;
+        &lt;button id=&quot;sendPrompt&quot; onclick=&quot;sendPrompt()&quot;&gt;Generate with AI&lt;/button&gt;
         &lt;button onclick=&quot;convertFull()&quot;&gt;Convert to Full Mod&lt;/button&gt;
-        &lt;button onclick=&quot;promptAndConvertToFull()&quot;&gt;Generate Full Mod&lt;/button&gt;
+        &lt;button id=&quot;sendLargePrompt&quot; onclick=&quot;promptAndConvertToFull()&quot;&gt;Generate Full Mod&lt;/button&gt;
         &lt;button onclick=&quot;runCreator(document.getElementById(&#39;output&#39;).value)&quot;&gt;Run&lt;/button&gt;
     &lt;/div&gt;
     &lt;div class=&quot;instructions&quot;&gt;
@@ -338,23 +338,6 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
             document.getElementById(&quot;userInput&quot;).value = text;
         });
     }
-
-    window.addEventListener(&quot;message&quot;, async function(event) {
-        if (event.data.type === &quot;prompt&quot;) {
-            const prompt = event.data.data;
-
-            // Run the AI function when the prompt is received
-            let outputTextValue = await ai({
-                instruction: prompt,
-                onChunk: function(data) {
-                    document.getElementById(&quot;output&quot;).value = data.fullTextSoFar;
-                },
-            });
-
-            // Send the output back to the parent page
-            window.parent.postMessage({ type: &quot;textResponse&quot;, data: outputTextValue }, &quot;*&quot;);
-        }
-    });
 
     function convertCOTText(inputText) {
         const nameReplacements = {
@@ -435,17 +418,28 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
         return inputText;
     }
 
-    // Listen for messages from the parent
-    window.addEventListener(&quot;message&quot;, (event) =&gt; {
-    if (event.data.type === &quot;sendAI&quot;) {
-        // Now `aiFunction` is available in the iframe
-        const aiFunction = event.data.aiFunction;
+/*------------------------- PERCHANCE -------------------------*/
+    /* Attach an event listener to the send button */
+    $(document).on(&quot;click&quot;, &quot;#sendPrompt&quot;, function () {
+        /* Get the value of the input field */
+        const prompt = $(&quot;#userInput&quot;).val();
         
-        // You can now call the AI function inside the iframe
-        async function sendPrompt(returnvalue = false) {
+        /* Send the prompt to the parent window */
+        if (window.parent) {
+            window.parent.postMessage({ type: &quot;prompt&quot;, data: prompt }, &quot;*&quot;);
         }
-    }
     });
+
+    /* Listen for the response from the parent*/
+    window.addEventListener(&quot;message&quot;, function (event) {
+        if (event.data.type === &quot;textResponse&quot;) {
+            const output = event.data.data; /* Get the response data */
+
+            /* Display the response in the promptTextOutput div */
+            document.getElementById(&quot;output&quot;).value = output;
+        }
+    });
+/*------------------------- PERCHANCE -------------------------*/
 
     async function sendPrompt(returnvalue = false) {
       // Get the value from the input field
