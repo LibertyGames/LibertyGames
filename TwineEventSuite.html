@@ -308,6 +308,11 @@ window.runCreator = function(text) {
         &lt;button id=&quot;sendLargePrompt&quot; onclick=&quot;promptAndConvertToFull()&quot;&gt;Generate Full Mod&lt;/button&gt;
         &lt;button onclick=&quot;runCreator(document.getElementById(&#39;output&#39;).value)&quot;&gt;Run&lt;/button&gt;
     &lt;/div&gt;
+    &lt;div class=&quot;buttons&quot;&gt;
+        &lt;button onclick=&quot;sendTriggerPrompt(false, false)&quot;&gt;Generate Event Trigger&lt;/button&gt;
+        &lt;button onclick=&quot;sendTriggerPrompt(false)&quot;&gt;Generate Event Trigger with AI&lt;/button&gt;
+        &lt;button onclick=&quot;convertFull()&quot;&gt;Convert to Full Mod&lt;/button&gt;
+    &lt;/div&gt;
     &lt;div class=&quot;instructions&quot;&gt;
       &lt;p&gt;&lt;strong&gt;Instructions:&lt;/strong&gt;&lt;/p&gt;
       &lt;ul&gt;
@@ -491,10 +496,10 @@ window.runCreator = function(text) {
     }
 /*------------------------- PERCHANCE -------------------------*/
 
-    async function sendPrompt(returnvalue = false) {
+    async function sendPrompt(returnValue = false) {
       // Get the value from the input field
       var inputValue = document.getElementById(&quot;userInput&quot;).value;
-      if (returnvalue === false) document.getElementById(&quot;output&quot;).value = &quot;&quot;;
+      if (returnValue === false) document.getElementById(&quot;output&quot;).value = &quot;&quot;;
   
       instruction = `
   AI Dialogue System Event Creation Please follow the instructions below to create a branching dialogue system event using the syntax provided. The goal is to generate branching dialogue paths that react to the player’s choices and utilize conditions based on variables.
@@ -548,9 +553,10 @@ window.runCreator = function(text) {
   
   Start with Title: Evemt[event name here, no spaces] + new line + &lt;&lt;dialogue &quot;start&quot;&gt;&gt;. No other code goes before it. End with &lt;&lt;/dialogue&gt;&gt;. No other code goes after it. I want a minimum of 20 dialogues.
       `
-        
+        // When posting to perchance.org/tps-cot-auto-text-converter#edit, do let outputTextValue = await ai({...
+        // When putting back to twee, do let outputTextValue = null; outputTextValue.generatedText = await aiFunction({...
         let outputTextValue = null;
-        outputTextValue.generatedText = await aiFunction({
+        outputTextValue.generatedText = await aiFunction({ 
             instruction: instruction,
             onChunk: function(data) {
                 console.log(data);
@@ -560,7 +566,174 @@ window.runCreator = function(text) {
 
         console.log(&quot;Output Text Value:&quot;, outputTextValue.generatedText);
         // Set the value to the &lt;p&gt; element
-        if (returnvalue === false) document.getElementById(&quot;output&quot;).value = outputTextValue.generatedText;
+        if (returnValue === false) document.getElementById(&quot;output&quot;).value = outputTextValue.generatedText;
+        return outputTextValue.generatedText;
+    }
+
+    async function sendTriggerPrompt(returnValue = false, aiEnabled = true, onPerchance = false) {
+      // Get the value from the input field
+      var inputValue = document.getElementById(&quot;userInput&quot;).value;
+      let outputTextValue = null;
+      if (returnValue === false) document.getElementById(&quot;output&quot;).value = &quot;\n\nAdd Javascript: \nsetup.Events.db.push(&quot;;
+      if (returnValue === true) outputTextValue = &quot;\n\nAdd Javascript: \nsetup.Events.db.push(&quot;;
+      
+      instruction = `
+Creating an Event Trigger in setup.Events.db
+This is the basic layout of an event trigger. You have the passage property, which indicates the passage to play. The tags property, determines the list of possible events that can be played. For example. the below passage can only be played if working at your job or at the dining hall. And frequency is how often the event occurs.
+EVENT TRIGGER:
+    {
+        passage: &quot;EventDiningHallOgle&quot;,
+        tags: [&quot;job&quot;, &quot;dining hall&quot;],
+        frequency: 10,
+    },
+
+    {
+        passage: &quot;EventQuickieBurgerEatVoyeur1&quot;,
+        tags: [&quot;QuickieBurger eat&quot;],
+        frequency: 100,
+        findnpc: {employee: true, gender: [&quot;male&quot;, &quot;transgender male&quot;, &quot;nonbinary amab&quot;, &quot;nonbinary afab&quot;]},
+    },
+
+Checkvar allows you to check run a specific condition to trigger the event. Some Examples of Checkvar Usage are below.
+        checkvar: &quot;setup.Needs.get_need(&#39;rest&#39;) lt 500&quot;,
+        checkvar: &quot;$quickieburgerjob and $quickieburgerjob.favor gte 25&quot;,
+        checkvar: &#39;$pcfollowers.length == 0&#39;,
+        checkvar: &quot;$pc.get_storage_location(&#39;laundryclothes&#39;).get_item_count()==0&quot;,
+        checkvar: &quot;!setup.people.is_sexpartner(&#39;The Best Friend&#39;) and $pc.get_storage_location(&#39;laundryclothes&#39;).get_item_count()==0&quot;,
+
+Hours allows you to only run an event between the inital hour and the following hour.
+        hours: [10, 12],
+
+Weekdays specify what days the event can run. 
+        weekdays: [&quot;Saturday&quot;, &quot;Sunday&quot;, &quot;Monday&quot;],
+		
+People Here only allows you to run an event when there&#39;s a certain amount of people present. 
+        peoplehere: 1,
+		
+Days Since only allows you to run an event after a certain number of days. 
+        &quot;days since&quot;: 1,
+		
+From Day only allows you to run an event after a certain number of in game days have passed.
+        &quot;from day&quot;: 0,
+
+Find NPC finds an NPC for an event to run with based on the npc&#39;s properties. 
+        findnpc: {type: &quot;student&quot;, customer: true},
+        findnpc: {customer: true, inclinations: &#39;voyeur&#39;, strictinclinations: true, nopartner: true},
+        findnpc: {employee: true, gender: [&quot;male&quot;, &quot;transgender male&quot;, &quot;nonbinary amab&quot;, &quot;nonbinary afab&quot;]},
+        findnpc: {employee: true, gender: [&quot;female&quot;, &quot;transgender female&quot;], noinclinations: &quot;slut&quot;},
+        findnpc: {attitudes: [&quot;lust&quot;], customer: true, attractiontopc: true, attractionfrompc: true, inclinations: &quot;forward&quot;, strictinclinations: true, 
+        findnpc: {attitudes: [&quot;lust&quot;], employee: true, attractiontopc: true, attractionfrompc: true, willingsex: true, inclinations: &quot;not_shy&quot;, strictinclinations: true, nopartner: true},
+        findnpc: {attractionfrompc: true, attractiontopc: true, relationship: [&quot;fuckbuddy&quot;], residence: &quot;Chicory Hall&quot;},
+		
+Find NPC Among finds an NPC among a type of NPC
+        findnpcamong: &quot;setup.people.people_of_type(&#39;student&#39;)&quot;,
+		
+Prereq highlights an event that must have been triggered prior to the event you&#39;re trying to trigger, else it won&#39;t trigger
+        prereq: &quot;EventDormParanoidRoommate&quot;,
+		
+Your skill must be at least this number to run this event
+        skill: [&quot;Disinhibition&quot;, 2],
+		
+Tags Dictionary
+	Summit Market Job Events
+		tags: [&quot;job&quot;, &quot;dining hall&quot;],
+	Eating at QuickieBurger Events
+        tags: [&quot;QuickieBurger eat&quot;],
+	Working at QuickieBurger Front Events
+        tags: [&quot;job&quot;, &quot;QuickieBurger&quot;, &quot;front&quot;],
+	Working at QuickieBurger Window Events
+        tags: [&quot;job&quot;, &quot;QuickieBurger&quot;, &quot;window&quot;],
+	Shower Events
+        tags: [&quot;shower&quot;, &quot;normal&quot;],
+	Restroom Events
+        tags: [&quot;restroom&quot;],
+		
+Relationship Type List
+	friend
+	best friend
+	fuckbuddy
+	rival
+	victim
+	bully
+	hatefuck
+	archenemy
+	crush
+	partner
+	soulmate
+	open partner
+	poly partner
+	dominant
+	submissive
+	
+Skills List
+    Sexual Knowledge
+    Charisma
+    Willpower
+    Exhibitionism
+    Voyeurism
+    Dominance
+    Submission
+    Hand
+    Oral
+    Vaginal
+    Penetrative
+    Anal
+    Physical&quot;,
+    Intellectual
+    Artistic
+    Photography
+    Writing
+    Video Gaming
+    Dancing
+    Gardening
+	Studying
+	Cooking
+
+The official formatting we&#39;re going to use is as follows:
+
+	
+Instruction:
+Create an Event Trigger for the following Event: ${inputValue}
+      `
+        // When posting to perchance.org/tps-cot-auto-text-converter#edit, do let outputTextValue = await ai({...
+        // When putting back to twee, do let outputTextValue = null; outputTextValue.generatedText = await aiFunction({...
+
+        // Handle the case for onPerchance being true or false
+        let outputText = null;
+        if (aiEnabled === false) {
+            if (returnValue === false) document.getElementById(&quot;output&quot;).value += `{\n    passage: &quot;EventPayRent&quot;,\n    tags: [&quot;campus walk&quot;, &quot;town walk&quot;],\n    frequency: 10,\n}`;
+            if (returnValue === true) outputTextValue += `{\n    passage: &quot;EventPayRent&quot;,\n    tags: [&quot;campus walk&quot;, &quot;town walk&quot;],\n    frequency: 10,\n}`;
+        } else {
+            // If AI Enabled
+            if (onPerchance === true) {
+                // If onPerchance is true, call the ai function
+                outputText = await ai({ 
+                    instruction: instruction,
+                    onChunk: function(data) {
+                        console.log(data);
+                        // document.getElementById(&quot;output&quot;).value += data.fullTextSoFar;
+                    },
+                });
+            } else if (onPerchance === false) {
+                // If onPerchance is false, call aiFunction
+                outputText.generatedText = await aiFunction({ 
+                    instruction: instruction,
+                    onChunk: function(data) {
+                        console.log(data);
+                        // document.getElementById(&quot;output&quot;).value += data.fullTextSoFar;
+                    },
+                });
+            }
+        }
+
+        if (aiEnabled === false) {
+            if (returnValue === false) document.getElementById(&quot;output&quot;).value += outputText.generatedText + &quot;);&quot;;
+            if (returnValue === true) outputTextValue + outputText.generatedText + &quot;);&quot;
+        } else {
+            if (returnValue === false) document.getElementById(&quot;output&quot;).value += &quot;);&quot;;
+            if (returnValue === true) outputTextValue += &quot;);&quot;;
+        }
+        
         return outputTextValue.generatedText;
     }
     
@@ -635,6 +808,7 @@ window.runCreator = function(text) {
         let outputValue = await sendPrompt(true);
         outputValue = convertCOTText(outputValue);
         outputValue = convertFull(outputValue);
+        sendTriggerPrompt(true);
         console.log(&quot;Generated Text:&quot;, outputValue);
         document.getElementById(&quot;output&quot;).value = outputValue;
     }
