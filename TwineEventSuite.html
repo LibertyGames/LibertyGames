@@ -538,7 +538,7 @@ Now, I want you to make an event where you and Amanda get into a fight over who&
       `
         
         let outputTextValue = null;
-        let outputTextValue.generatedText = await aiFunction({
+        outputTextValue.generatedText = await aiFunction({
             instruction: instruction,
             onChunk: function(data) {
                 console.log(data);
